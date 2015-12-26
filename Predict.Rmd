@@ -1,0 +1,21 @@
+---
+title: "Predicting type of activity"
+author: "Olga Illarionova"
+date: "December 26, 2015"
+output: html_document
+---
+
+
+First of all I clean data. I remove columns where more than 95% values were missing.
+```{r}
+train <- train %>% select( which(colMeans(is.na(.)) < 0.95))
+train <- train %>% select( which(colMeans(.=="") < 0.95))
+```
+
+
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

@@ -15,5 +15,11 @@ ColNums_NotAllMissing <- function(df){ # helper function
       as.vector(which(colSums(is.na(df)) != nrow(df)))
 }
 
-train <- train %>% select( which(colMeans(is.na(.)) < 0.95))
-train <- train %>% select( which(colMeans(.=="") < 0.95))
+train2 <- train %>% select( which(colMeans(is.na(.)) < 0.95))
+train2 <- train2 %>% select( which(colMeans(.=="") < 0.95), -X )
+
+set.seed(91)
+ModelRF <- train(classe ~ ., method="rf",data=train )
+a<-confusionMatrix(train$classe,predict(ModelRF,train))
+
+#tr1 <- train %>% select( X, classe)

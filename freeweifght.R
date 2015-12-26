@@ -19,7 +19,8 @@ train2 <- train %>% select( which(colMeans(is.na(.)) < 0.95))
 train2 <- train2 %>% select( which(colMeans(.=="") < 0.95), -X )
 
 set.seed(91)
-ModelRF <- train(classe ~ ., method="rf",data=train )
-a<-confusionMatrix(train$classe,predict(ModelRF,train))
+#ModelRF <- train(classe ~ ., method="rf",data=train2 )
+#a<-confusionMatrix(train$classe,predict(ModelRF,train2))
+folds <- createFolds(y = train2$classe, k = 20)
 
 #tr1 <- train %>% select( X, classe)

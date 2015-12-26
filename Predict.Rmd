@@ -6,16 +6,18 @@ output: html_document
 ---
 
 
-First of all I clean data. I remove columns where more than 95% values were missing.
+First of all I clean data. I remove columns where more than 95% values were missing. Also I remove column "X" just because it is convinient to me.
 ```{r}
 train <- train %>% select( which(colMeans(is.na(.)) < 0.95))
-train <- train %>% select( which(colMeans(.=="") < 0.95))
+train <- train %>% select( which(colMeans(.=="") < 0.95), -X )
+```
+
+Then I created model. I use method random forest.
+
+Accuracy of my model on training set is.
+
+```{r}
+confusionMatrix(train$classe,predict(ModelRF,train))
 ```
 
 
-
-```{r, echo=FALSE}
-plot(cars)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.

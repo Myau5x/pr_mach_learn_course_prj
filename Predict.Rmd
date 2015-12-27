@@ -5,19 +5,59 @@ date: "December 26, 2015"
 output: html_document
 ---
 
-
-First of all I clean data. I remove columns where more than 95% values were missing. Also I remove column "X" just because it is convinient to me.
+I download data and required libraries.
 ```{r}
-train <- train %>% select( which(colMeans(is.na(.)) < 0.95))
-train <- train %>% select( which(colMeans(.=="") < 0.95), -X )
+library(caret)
+library(dplyr)
+set.seed(91)
+test <- read.csv("pml-testing.csv")
+train <- read.csv("pml-training.csv")
 ```
 
-Then I created model. I use method random forest.
-
-Accuracy of my model on training set is.
-
+First of all I clean data. I remove columns where more than 95% values were missing. Also I remove column "X" just because it is convinient to me. I pdivide big training set for two sets: training and validation sets.
 ```{r}
-confusionMatrix(train$classe,predict(ModelRF,train))
+inTrain <- createDataPartition(y=train$classe,
+                               p=0.7, list=FALSE)
+train2 <- train %>% select( which(colMeans(is.na(.)) < 0.95))
+train2 <- train2 %>% select( which(colMeans(train2=="") < 0.95), -X )
+train2 <- train2[inTrain,]
+testing <- train2[-inTrain,]
+
 ```
 
+Then I made some preprocess with my data. I made principal component analysys with threshold of captured variance equal to 0.9.
+```{r}
+preProc <- preProcess(train2,method="pca",thresh = 0.9)
+#newTrain <- training[,c(ilp,diagnosis)]
+trainPC <- predict(preProc,train2)
+testPC <- predict(preProc,testing)
+
+```
+Then I created model. I use method treebag in caret package. I chose this method because it gets good accuracy and don't takes much time.
+```{r}
+modelFitPC <- train(classe ~ .,method="treebag",data=trainPC)
+
+```
+
+
+Accuracy of my model on training set is 0.98.
+```{r}
+tttr<- confusionMatrix(train2$classe,predict(modelFitPC,trainPC))
+tttr
+```
+
+Accuracy of my model on validation set is 0.95.
+```{r}
+ttts<- confusionMatrix(testing$classe,predict(modelFitPC,testPC))
+ttts
+```
+I calculate missclassifiction rate using following formula:
+```{r}
+missClass = function(values,prediction){
+      sum(prediction != values)/length(values)}
+#training set missclassification
+mtr<- missClass(trainPC$classe,predict(modelFitPC,trainPC))
+#testing (validation) set missclassification
+mts<- missClass(testPC$classe,predict(modelFitPC,testPC))
+```
 
